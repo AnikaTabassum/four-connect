@@ -36,14 +36,10 @@ def validLocations(board):
 			validLocation.append(col)
 	return validLocation
 
-def get_next_open_row(board, col):
+def getFreeRow(board, col):
 	for r in range(rows):
 		if board[r][col] == 0:
 			return r
-
-def initialization():
-	board = np.zeros((rows,columns))
-	return board
 
 def putPiece(board, row, col, piece):
 	board[row][col] = piece
@@ -103,7 +99,7 @@ def getScore(board, piece):
 	#horizontal
 	for r in range(rows):
 		rowArray =list(board[r])
-		print(rowArray)
+		#print(rowArray)
 		for c in range(columns-3):
 			box = rowArray[c:c+connect]
 			score += countPieces(box, piece)
@@ -157,17 +153,17 @@ def minimax(board, depth, alpha, beta, maxNode):
 	valid_locations=validLocations(board)
 	#valid_locations=[0,1,2,3,4,5,6]
 	#print(valid_locations)
-	if depth == 0 or checkEnd(board):
-		if checkEnd(board):
-			if winning(board, player_2):
-				return (None, 1000000)
-			elif winning(board, player_1):
-				return (None, -1000000)
-			else: # Game is over, no more valid moves
-				return (None, 0)
-		if depth==0:
-			#print("akib ", getScore(board, player_2))
-			return (None, getScore(board, player_2))
+	if checkEnd(board):
+		if winning(board, player_2):
+			return (None, 1000000)
+		elif winning(board, player_1):
+			return (None, -1000000)
+		else: 
+			return (None, 0)
+
+	if depth==0:
+		#print("akib ", getScore(board, player_2))
+		return (None, getScore(board, player_2))
 	if maxNode:
 		
 		tempBeta = negInf
@@ -178,7 +174,7 @@ def minimax(board, depth, alpha, beta, maxNode):
 			tempBoard = board.copy()
 			row = checkAvailableRow(board, col)
 			putPiece(tempBoard, row, col, player_2)
-			newValue = minimax(tempBoard, depth-1, alpha, beta, False)[1]
+			noneed, newValue = minimax(tempBoard, depth-1, alpha, beta, False)
 			#print(newValue)
 
 			if newValue > tempBeta:
@@ -192,7 +188,7 @@ def minimax(board, depth, alpha, beta, maxNode):
 				#print(alpha)
 			
 			if alpha >= beta:
-				print("pruning done- 1")
+				#print("pruning done- 1")
 				break
 		return choose, tempBeta
 
@@ -204,7 +200,7 @@ def minimax(board, depth, alpha, beta, maxNode):
 			row = checkAvailableRow(board, col)
 			tempBoard = board.copy()
 			putPiece(tempBoard, row, col, player_1)
-			amarValue = minimax(tempBoard, depth-1, alpha, beta, True)[1]
+			noneed, amarValue = minimax(tempBoard, depth-1, alpha, beta, True)
 			
 			if amarValue < tempAlpha:
 				tempAlpha = amarValue
@@ -216,7 +212,7 @@ def minimax(board, depth, alpha, beta, maxNode):
 				beta=beta
 			#beta = min(beta, tempAlpha)
 			if alpha >= beta:
-				print("pruning done- 2")
+				#print("pruning done- 2")
 				break
 		return choose, tempAlpha
 
@@ -234,7 +230,7 @@ def makegui(board):
 				pygame.draw.circle(screen, blue, (int(c*rectangleWidth+rectangleWidth/2), height-int(r*rectangleHeight+rectangleHeight/2)), radius)
 	pygame.display.update()
 
-board = initialization()
+board = np.zeros((rows,columns))
 pygame.init()
 
 makegui(board)
@@ -246,7 +242,7 @@ font =pygame.font.SysFont("comicsansms", 150)
 while not flag:
 	if flag:
 
-		pygame.time.wait(5000)
+		pygame.time.wait(8000)
 	
 	if turn == pc:				
 
@@ -254,7 +250,7 @@ while not flag:
 
 		if isValid(board, col):
 			#pygame.time.wait(500)
-			row = get_next_open_row(board, col)
+			row = getFreeRow(board, col)
 			putPiece(board, row, col, player_2)
 
 			if winning(board, player_2):
