@@ -13,7 +13,7 @@ def checkForFreeRow(board, col):
 			return r
 def myHeuristic(numberOfPiece):
 	fact=math.factorial(numberOfPiece)
-	return 2**fact
+	return 3**fact
 
 
 def countPieces(box, piece):
@@ -29,7 +29,7 @@ def countPieces(box, piece):
 		score +=myHeuristic(3)
 
 	elif box.count(piece) == 4:
-		score +=myHeuristic(4)
+		score +=myHeuristic(7)
 
 	if box.count(opp_piece) == 3:
 		score -=myHeuristic(3)
